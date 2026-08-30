@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCQ Practice Platform</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Login -->
+  <div id="loginScreen" class="container hidden">
+    <div class="header">
+      <h1>🎓 MCQ Practice Platform</h1>
+      <p>Login to start practicing</p>
+    </div>
+    <div id="loginError" class="error-message hidden"></div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUsername" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <div class="toggle-link">Don't have an account? <a id="showSignup">Sign up here</a></div>
+  </div>
+
+  <!-- Signup -->
+  <div id="signupScreen" class="container hidden">
+    <div class="header">
+      <h1>🎓 Create Account</h1>
+      <p>Join us to start practicing</p>
+    </div>
+    <div id="signupError" class="error-message hidden"></div>
+    <div id="signupSuccess" class="success-message hidden"></div>
+    <form id="signupForm">
+      <div class="form-group"><label>Full Name</label><input type="text" id="signupName" required></div>
+      <div class="form-group"><label>Username</label><input type="text" id="signupUsername" required></div>
+      <div class="form-group"><label>Password</label><input type="password" id="signupPassword" required minlength="4"></div>
+      <button type="submit" class="btn btn-primary">Create Account</button>
+    </form>
+    <div class="toggle-link">Already have an account? <a id="showLogin">Login here</a></div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboardScreen" class="container hidden">
+    <div class="header">
+      <h1>Welcome, <span id="userName"></span>!</h1>
+    </div>
+    <div class="welcome-section">
+      <h2>Select Quiz Category</h2>
+      <div class="category-cards">
+
+        <div class="category-card">
+          <h3>🧠 General Knowledge</h3>
+          <p>World Geography & Facts</p>
+          <button class="btn btn-primary practice-btn" data-cat="General Knowledge" data-mode="practice">Practice Mode</button>
+          <button class="btn btn-primary exam-btn" data-cat="General Knowledge" data-mode="exam">Mock Exam</button>
+        </div>
+
+        <div class="category-card">
+          <h3>🏆 Competitive Exams</h3>
+          <p>Advanced MCQ Practice</p>
+          <button class="btn btn-primary practice-btn" data-cat="Competitive Exams" data-mode="practice">Practice Mode</button>
+          <button class="btn btn-primary exam-btn" data-cat="Competitive Exams" data-mode="exam">Mock Exam</button>
+        </div>
+
+        <!-- NEW NCSM CARD -->
+        <div class="category-card ncsm-card">
+          <div class="ncsm-logo">💻</div>
+          <h3>NCSM</h3>
+          <p>National Computer Saksharta Mission</p>
+          <button class="btn btn-primary" id="openNcsmBtn">Mock Test</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW NCSM SUBJECT SCREEN -->
+  <div id="ncsmScreen" class="container hidden">
+    <div class="header">
+      <h1>💻 NCSM Mock Test</h1>
+      <p>National Computer Saksharta Mission</p>
+    </div>
+    <div class="ncsm-info">
+      <strong>Select a Subject</strong>
+      <span>Choose one of the 12 subjects below to start its mock test.</span>
+    </div>
+    <div id="ncsmSubjects" class="subject-grid"></div>
+    <button class="btn btn-secondary back-btn" id="backFromNcsmBtn">← Back to Dashboard</button>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quizScreen" class="container quiz-container hidden">
+    <div class="header">
+      <h1>MCQ Practice</h1>
+      <div class="quiz-title" id="quizTitle"></div>
+      <div class="progress">Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></div>
+    </div>
+    <div class="question-card">
+      <div class="question-text" id="questionText"></div>
+      <div id="optionsContainer"></div>
+      <div id="feedback" class="feedback-panel hidden"></div>
+    </div>
+    <div class="quiz-nav">
+      <button class="btn btn-secondary nav-half" id="prevBtn">Previous</button>
+      <button class="btn btn-primary nav-half" id="nextBtn">Next</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="resultScreen" class="container hidden">
+    <div class="result-card">
+      <div class="header"><h1>🎉 Quiz Complete!</h1></div>
+      <div class="result-score" id="scoreDisplay"></div>
+      <div class="result-message" id="resultMessage"></div>
+      <div id="recommendation" class="result-message recommendation"></div>
+      <button class="btn btn-primary" id="reviewAnswersBtn">📝 Review Answers</button>
+      <button class="btn btn-primary" id="retakeQuizBtn">Take Another Quiz</button>
+      <button class="btn btn-secondary" id="backToDashboardBtn">Back to Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Review -->
+  <div id="reviewScreen" class="container quiz-container hidden">
+    <div class="header">
+      <h1>📝 Answer Review</h1>
+      <p>See all questions with correct answers</p>
+    </div>
+    <div id="reviewContainer"></div>
+    <button class="btn btn-secondary" id="backToResultBtn">Back to Results</button>
+    <button class="btn btn-primary" id="backToDashboardFromReviewBtn">Back to Dashboard</button>
+  </div>
+
+  <!-- User Results -->
+  <div id="userResultsScreen" class="container admin-panel hidden">
+    <div class="header"><h1>📊 My Results</h1></div>
+    <div id="userResultsContainer"></div>
+    <button class="btn btn-secondary" id="backFromResultsBtn">Back to Dashboard</button>
+  </div>
+
+  <!-- Admin -->
+  <div id="adminScreen" class="container admin-panel hidden">
+    <div class="header">
+      <h1>👨‍💼 Admin Panel</h1>
+      <p>View results and manage all questions</p>
+    </div>
+
+    <div id="adminStats"></div>
+    <div id="allResults"></div>
+
+    <div class="manage-section">
+      <h2>📚 Manage Quiz Bank</h2>
+      <button class="btn btn-danger" id="adminLogoutBtn">Logout</button>
+    </div>
+
+    <form id="addQuestionForm">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="newCategory">
+          <option>General Knowledge</option>
+          <option>Competitive Exams</option>
+          <option>NCSM</option>
+        </select>
+      </div>
+
+      <!-- NEW NCSM SUBJECT FIELD -->
+      <div class="form-group" id="subjectGroup">
+        <label>NCSM Subject</label>
+        <select id="newSubject"></select>
+        <small class="field-help">Used only for NCSM questions.</small>
+      </div>
+
+      <div class="form-group">
+        <label>Question</label>
+        <textarea id="newQuestion" required></textarea>
+      </div>
+      <div class="form-group"><label>Option 1</label><input type="text" id="opt1" required></div>
+      <div class="form-group"><label>Option 2</label><input type="text" id="opt2" required></div>
+      <div class="form-group"><label>Option 3</label><input type="text" id="opt3" required></div>
+      <div class="form-group"><label>Option 4</label><input type="text" id="opt4" required></div>
+
+      <div class="form-group">
+        <label>Correct Index (0-3)</label>
+        <input type="number" id="newCorrect" min="0" max="3" required>
+        <small class="field-help">0 = Option 1, 1 = Option 2, 2 = Option 3, 3 = Option 4</small>
+      </div>
+
+      <div class="form-group">
+        <label>Explanation</label>
+        <textarea id="newExplanation"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">➕ Add Question</button>
+    </form>
+
+    <div class="manage-section">
+      <h3>📥 Import / Export Questions</h3>
+      <div class="form-group">
+        <label>Import Questions (JSON Array)</label>
+        <textarea id="importTextarea" placeholder='[{"question":"...","options":["A","B","C","D"],"correct":0,"category":"NCSM","subject":"Computer Fundamentals","explanation":"..."}]'></textarea>
+      </div>
+      <button class="btn btn-primary" id="importBtn">Import JSON</button>
+      <button class="btn btn-secondary" id="exportBtn">Export All Questions (JSON)</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
+
