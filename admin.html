@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="MCQ Practice Platform - Secure Admin Dashboard"
+  >
+
+  <title>Admin Dashboard | MCQ Practice Platform</title>
+
+  <!-- =====================================================
+       ADMIN CSS
+       ===================================================== -->
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+  <!-- =====================================================
+       AUTH LOADING SCREEN
+       ===================================================== -->
+
+  <div
+    id="authLoadingScreen"
+    class="auth-loading-screen"
+  >
+
+    <div class="loading-card">
+
+      <div class="loading-spinner"></div>
+
+      <h2>Checking Authentication</h2>
+
+      <p>
+        Please wait while we securely verify your account.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       ADMIN LOGIN SCREEN
+       ===================================================== -->
+
+  <div
+    id="adminLoginScreen"
+    class="admin-login-screen hidden"
+  >
+
+    <div class="login-background"></div>
+
+    <div class="admin-login-card">
+
+      <!-- Logo -->
+
+      <div class="admin-login-logo">
+        <div class="logo-icon">
+          🛡️
+        </div>
+
+        <div>
+          <h1>Admin Portal</h1>
+
+          <p>
+            MCQ Practice Platform
+          </p>
+        </div>
+      </div>
+
+
+      <!-- Login Header -->
+
+      <div class="login-heading">
+
+        <h2>Welcome Back</h2>
+
+        <p>
+          Sign in to access the administration panel.
+        </p>
+
+      </div>
+
+
+      <!-- Login Error -->
+
+      <div
+        id="adminLoginError"
+        class="login-message error-message hidden"
+      ></div>
+
+
+      <!-- Login Success -->
+
+      <div
+        id="adminLoginSuccess"
+        class="login-message success-message hidden"
+      ></div>
+
+
+      <!-- Login Form -->
+
+      <form id="adminLoginForm">
+
+        <div class="form-group">
+
+          <label for="adminEmail">
+            Email Address
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              ✉
+            </span>
+
+            <input
+              type="email"
+              id="adminEmail"
+              name="email"
+              placeholder="admin@example.com"
+              autocomplete="email"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="adminPassword">
+            Password
+          </label>
+
+          <div class="input-wrapper">
+
+            <span class="input-icon">
+              🔒
+            </span>
+
+            <input
+              type="password"
+              id="adminPassword"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            >
+
+            <button
+              type="button"
+              id="toggleAdminPassword"
+              class="password-toggle"
+              aria-label="Show password"
+            >
+              👁
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="login-options">
+
+          <label class="remember-option">
+
+            <input
+              type="checkbox"
+              id="rememberAdmin"
+            >
+
+            <span>
+              Remember this device
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <button
+          type="submit"
+          id="adminLoginBtn"
+          class="btn btn-primary btn-login"
+        >
+
+          <span
+            id="adminLoginBtnText"
+          >
+            Sign In
+          </span>
+
+          <span
+            id="adminLoginSpinner"
+            class="button-spinner hidden"
+          ></span>
+
+        </button>
+
+      </form>
+
+
+      <!-- Security Notice -->
+
+      <div class="security-notice">
+
+        <span class="security-icon">
+          🔐
+        </span>
+
+        <div>
+
+          <strong>
+            Secure Admin Access
+          </strong>
+
+          <p>
+            Access is protected by Firebase Authentication
+            and Firestore authorization.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="login-footer">
+
+        <a href="index.html">
+          ← Back to MCQ Platform
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       ACCESS DENIED SCREEN
+       ===================================================== -->
+
+  <div
+    id="accessDeniedScreen"
+    class="access-denied-screen hidden"
+  >
+
+    <div class="access-denied-card">
+
+      <div class="access-denied-icon">
+        🚫
+      </div>
+
+      <h1>Access Denied</h1>
+
+      <p id="accessDeniedMessage">
+        Your account does not have administrator privileges.
+      </p>
+
+      <div class="access-denied-actions">
+
+        <button
+          id="deniedLogoutBtn"
+          class="btn btn-secondary"
+        >
+          Sign Out
+        </button>
+
+        <a
+          href="index.html"
+          class="btn btn-primary"
+        >
+          Back to Platform
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       ADMIN APPLICATION
+       ===================================================== -->
+
+  <div
+    id="adminApp"
+    class="admin-app hidden"
+  >
+
+
+    <!-- ===================================================
+         SIDEBAR
+         =================================================== -->
+
+    <aside
+      id="adminSidebar"
+      class="admin-sidebar"
+    >
+
+      <!-- Sidebar Header -->
+
+      <div class="sidebar-header">
+
+        <div class="sidebar-brand-icon">
+          🛡️
+        </div>
+
+        <div class="sidebar-brand-text">
+
+          <strong>
+            MCQ Admin
+          </strong>
+
+          <span>
+            Control Panel
+          </span>
+
+        </div>
+
+        <button
+          id="closeSidebarBtn"
+          class="mobile-sidebar-close"
+          type="button"
+          aria-label="Close menu"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- Admin Profile -->
+
+      <div class="sidebar-profile">
+
+        <div
+          id="sidebarAdminAvatar"
+          class="admin-avatar"
+        >
+          A
+        </div>
+
+        <div class="sidebar-profile-info">
+
+          <strong
+            id="sidebarAdminName"
+          >
+            Administrator
+          </strong>
+
+          <span
+            id="sidebarAdminEmail"
+          >
+            admin@example.com
+          </span>
+
+        </div>
+
+        <span
+          id="adminStatusDot"
+          class="status-dot active"
+          title="Online"
+        ></span>
+
+      </div>
+
+
+      <!-- Navigation -->
+
+      <nav class="admin-navigation">
+
+        <div class="nav-label">
+          MAIN
+        </div>
+
+
+        <button
+          class="admin-nav-item active"
+          data-section="dashboard"
+          type="button"
+        >
+
+          <span class="nav-icon">
+            ◉
+          </span>
+
+          <span>
+            Dashboard
+          </span>
+
+        </button>
+
+
+        <button
+          class="admin-nav-item"
+          data-section="questions"
+          type="button"
+        >
+
+          <span class="nav-icon">
+            ☷
+          </span>
+
+          <span>
+            Question Bank
+          </span>
+
+        </button>
+
+
+        <button
+          class="admin-nav-item"
+          data-section="addQuestion"
+          type="button"
+        >
+
+          <span class="nav-icon">
+            ＋
+          </span>
+
+          <span>
+            Add Question
+          </span>
+
+        </button>
+
+
+        <button
+          class="admin-nav-item"
+          data-section="users"
+          type="button"
+        >
+
+          <span class="nav-icon">
+            ♙
+          </span>
+
+          <span>
+            Users
+          </span>
+
+        </button>
+
+
+        <button
+          class="admin-nav-item"
+          data-section="results"
+          type="button"
+        >
+
+          <span class="nav-icon">
+            ▥
+          </span>
+
+          <span>
+            Results
+          </span>
+
+        </button>
+
+
+        <div class="nav-label">
+          TOOLS
+        </div>
+
+
+        <button
+          class="admin-nav-item"
+          data-section="importExport"
+          type="button"
+        >
+
+          <span class="nav-icon">
+            ⇅
+          </span>
+
+          <span>
+            Import / Export
+          </span>
+
+        </button>
+
+
+        <button
+          class="admin-nav-item"
+          data-section="settings"
+          type="button"
+        >
+
+          <span class="nav-icon">
+            ⚙
+          </span>
+
+          <span>
+            Settings
+          </span>
+
+        </button>
+
+      </nav>
+
+
+      <!-- Sidebar Bottom -->
+
+      <div class="sidebar-bottom">
+
+        <a
+          href="index.html"
+          class="sidebar-platform-link"
+        >
+
+          <span>
+            ←
+          </span>
+
+          <span>
+            View Platform
+          </span>
+
+        </a>
+
+
+        <button
+          id="logoutBtn"
+          class="sidebar-logout"
+          type="button"
+        >
+
+          <span>
+            ⇥
+          </span>
+
+          <span>
+            Sign Out
+          </span>
+
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- ===================================================
+         MAIN CONTENT
+         =================================================== -->
+
+    <main class="admin-main">
+
+
+      <!-- =================================================
+           TOP HEADER
+           ================================================= -->
+
+      <header class="admin-topbar">
+
+        <div class="topbar-left">
+
+          <button
+            id="mobileMenuBtn"
+            class="mobile-menu-btn"
+            type="button"
+            aria-label="Open menu"
+          >
+            ☰
+          </button>
+
+          <div class="page-heading">
+
+            <h1 id="pageTitle">
+              Dashboard
+            </h1>
+
+            <p id="pageSubtitle">
+              Overview of your MCQ platform
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+
+          <!-- Platform Link -->
+
+          <a
+            href="index.html"
+            class="topbar-icon-btn"
+            title="Open platform"
+          >
+            ↗
+          </a>
+
+
+          <!-- Notifications -->
+
+          <button
+            id="notificationBtn"
+            class="topbar-icon-btn"
+            type="button"
+            title="Notifications"
+          >
+
+            ♢
+
+            <span
+              id="notificationBadge"
+              class="notification-badge hidden"
+            >
+              0
+            </span>
+
+          </button>
+
+
+          <!-- Admin Profile -->
+
+          <div class="topbar-profile">
+
+            <div
+              id="topbarAdminAvatar"
+              class="admin-avatar small"
+            >
+              A
+            </div>
+
+            <div class="topbar-profile-info">
+
+              <strong
+                id="topbarAdminName"
+              >
+                Administrator
+              </strong>
+
+              <span>
+                Admin
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <!-- =================================================
+           CONTENT AREA
+           ================================================= -->
+
+      <div class="admin-content">
+
+
+        <!-- ===============================================
+             DASHBOARD
+             =============================================== -->
+
+        <section
+          id="dashboard"
+          class="admin-section active"
+          data-section-content="dashboard"
+        >
+
+          <div class="section-intro">
+
+            <div>
+
+              <h2>
+                Dashboard Overview
+              </h2>
+
+              <p>
+                Monitor your question bank, users and quiz
+                activity.
+              </p>
+
+            </div>
+
+            <div
+              id="dashboardDate"
+              class="dashboard-date"
+            ></div>
+
+          </div>
+
+
+          <!-- Statistics -->
+
+          <div class="stats-grid">
+
+
+            <div class="stat-card">
+
+              <div class="stat-card-icon questions">
+                ☷
+              </div>
+
+              <div class="stat-card-content">
+
+                <span>
+                  Total Questions
+                </span>
+
+                <strong id="totalQuestions">
+                  0
+                </strong>
+
+                <small>
+                  Across all categories
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+              <div class="stat-card-icon users">
+                ♙
+              </div>
+
+              <div class="stat-card-content">
+
+                <span>
+                  Registered Users
+                </span>
+
+                <strong id="totalUsers">
+                  0
+                </strong>
+
+                <small>
+                  Student accounts
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+              <div class="stat-card-icon results">
+                ▥
+              </div>
+
+              <div class="stat-card-content">
+
+                <span>
+                  Quiz Attempts
+                </span>
+
+                <strong id="totalResults">
+                  0
+                </strong>
+
+                <small>
+                  Total submissions
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+              <div class="stat-card-icon ncsm">
+                💻
+              </div>
+
+              <div class="stat-card-content">
+
+                <span>
+                  NCSM Questions
+                </span>
+
+                <strong id="ncsmQuestions">
+                  0
+                </strong>
+
+                <small>
+                  All NCSM subjects
+                </small>
+
+              </div>
+
+            </div>
+
+
+          </div>
+
+
+          <!-- Dashboard Columns -->
+
+          <div class="dashboard-grid">
+
+
+            <!-- Category Distribution -->
+
+            <div class="dashboard-card">
+
+              <div class="card-header">
+
+                <div>
+
+                  <h3>
+                    Question Distribution
+                  </h3>
+
+                  <p>
+                    Questions by category
+                  </p>
+
+                </div>
+
+              </div>
+
+              <div
+                id="categoryDistribution"
+                class="category-distribution"
+              >
+
+                <div class="empty-state">
+                  <p>
+                    Loading question statistics...
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- Quick Actions -->
+
+            <div class="dashboard-card">
+
+              <div class="card-header">
+
+                <div>
+
+                  <h3>
+                    Quick Actions
+                  </h3>
+
+                  <p>
+                    Common administration tasks
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="quick-actions">
+
+
+                <button
+                  class="quick-action"
+                  data-section="addQuestion"
+                  type="button"
+                >
+
+                  <span class="quick-action-icon">
+                    ＋
+                  </span>
+
+                  <span>
+
+                    <strong>
+                      Add Question
+                    </strong>
+
+                    <small>
+                      Create a new MCQ
+                    </small>
+
+                  </span>
+
+                </button>
+
+
+                <button
+                  class="quick-action"
+                  data-section="questions"
+                  type="button"
+                >
+
+                  <span class="quick-action-icon">
+                    ☷
+                  </span>
+
+                  <span>
+
+                    <strong>
+                      Manage Questions
+                    </strong>
+
+                    <small>
+                      Edit or delete questions
+                    </small>
+
+                  </span>
+
+                </button>
+
+
+                <button
+                  class="quick-action"
+                  data-section="users"
+                  type="button"
+                >
+
+                  <span class="quick-action-icon">
+                    ♙
+                  </span>
+
+                  <span>
+
+                    <strong>
+                      View Users
+                    </strong>
+
+                    <small>
+                      Manage student accounts
+                    </small>
+
+                  </span>
+
+                </button>
+
+
+                <button
+                  class="quick-action"
+                  data-section="results"
+                  type="button"
+                >
+
+                  <span class="quick-action-icon">
+                    ▥
+                  </span>
+
+                  <span>
+
+                    <strong>
+                      View Results
+                    </strong>
+
+                    <small>
+                      Check quiz performance
+                    </small>
+
+                  </span>
+
+                </button>
+
+
+              </div>
+
+            </div>
+
+
+          </div>
+
+
+          <!-- Recent Results -->
+
+          <div class="dashboard-card">
+
+            <div class="card-header">
+
+              <div>
+
+                <h3>
+                  Recent Quiz Results
+                </h3>
+
+                <p>
+                  Latest student submissions
+                </p>
+
+              </div>
+
+              <button
+                class="text-button"
+                data-section="results"
+                type="button"
+              >
+                View All →
+              </button>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+              <table class="admin-table">
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Student
+                    </th>
+
+                    <th>
+                      Category
+                    </th>
+
+                    <th>
+                      Subject
+                    </th>
+
+                    <th>
+                      Score
+                    </th>
+
+                    <th>
+                      Percentage
+                    </th>
+
+                    <th>
+                      Date
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody
+                  id="dashboardResultsTable"
+                >
+
+                  <tr>
+
+                    <td colspan="6">
+
+                      <div class="table-loading">
+                        Loading results...
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             QUESTIONS
+             =============================================== -->
+
+        <section
+          id="questions"
+          class="admin-section"
+          data-section-content="questions"
+        >
+
+          <div class="section-intro">
+
+            <div>
+
+              <h2>
+                Question Bank
+              </h2>
+
+              <p>
+                View, edit and manage all MCQ questions.
+              </p>
+
+            </div>
+
+            <button
+              class="btn btn-primary"
+              data-section="addQuestion"
+              type="button"
+            >
+              ＋ Add Question
+            </button>
+
+          </div>
+
+
+          <div class="filter-toolbar">
+
+            <div class="search-box">
+
+              <span>
+                🔍
+              </span>
+
+              <input
+                type="search"
+                id="questionSearch"
+                placeholder="Search questions..."
+              >
+
+            </div>
+
+
+            <select
+              id="questionCategoryFilter"
+              class="filter-select"
+            >
+
+              <option value="all">
+                All Categories
+              </option>
+
+            </select>
+
+
+            <button
+              id="refreshQuestionsBtn"
+              class="btn btn-secondary"
+              type="button"
+            >
+              ↻ Refresh
+            </button>
+
+          </div>
+
+
+          <div class="dashboard-card">
+
+            <div class="table-wrapper">
+
+              <table class="admin-table">
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Question
+                    </th>
+
+                    <th>
+                      Category
+                    </th>
+
+                    <th>
+                      Subject
+                    </th>
+
+                    <th>
+                      Correct
+                    </th>
+
+                    <th>
+                      Actions
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody
+                  id="questionsTableBody"
+                >
+
+                  <tr>
+
+                    <td colspan="5">
+
+                      <div class="table-loading">
+                        Loading questions...
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             ADD / EDIT QUESTION
+             =============================================== -->
+
+        <section
+          id="addQuestion"
+          class="admin-section"
+          data-section-content="addQuestion"
+        >
+
+          <div class="section-intro">
+
+            <div>
+
+              <h2>
+                Add Question
+              </h2>
+
+              <p>
+                Create a new question for your quiz bank.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-card">
+
+            <form id="questionForm">
+
+
+              <div class="form-section-title">
+
+                <span>
+                  01
+                </span>
+
+                <div>
+
+                  <h3>
+                    Question Information
+                  </h3>
+
+                  <p>
+                    Select where this question belongs.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="form-grid">
+
+
+                <div class="form-group">
+
+                  <label for="newCategory">
+                    Category
+                  </label>
+
+                  <select
+                    id="newCategory"
+                    required
+                  >
+
+                    <option value="General Knowledge">
+                      General Knowledge
+                    </option>
+
+                    <option value="Competitive Exams">
+                      Competitive Exams
+                    </option>
+
+                    <option value="NCSM">
+                      NCSM
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                <div
+                  class="form-group"
+                  id="subjectGroup"
+                >
+
+                  <label for="newSubject">
+                    NCSM Subject
+                  </label>
+
+                  <select id="newSubject">
+
+                    <option value="">
+                      Select NCSM Subject
+                    </option>
+
+                  </select>
+
+                  <small class="field-help">
+                    Used only for NCSM questions.
+                  </small>
+
+                </div>
+
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="newQuestion">
+                  Question
+                </label>
+
+                <textarea
+                  id="newQuestion"
+                  rows="4"
+                  placeholder="Type the question here..."
+                  required
+                ></textarea>
+
+              </div>
+
+
+              <div class="form-section-title">
+
+                <span>
+                  02
+                </span>
+
+                <div>
+
+                  <h3>
+                    Answer Options
+                  </h3>
+
+                  <p>
+                    Enter four possible answers.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="options-grid">
+
+
+                <div class="form-group option-field">
+
+                  <label for="opt1">
+                    Option 1
+                  </label>
+
+                  <div class="option-input">
+
+                    <span>
+                      A
+                    </span>
+
+                    <input
+                      type="text"
+                      id="opt1"
+                      placeholder="Option 1"
+                      required
+                    >
+
+                  </div>
+
+                </div>
+
+
+                <div class="form-group option-field">
+
+                  <label for="opt2">
+                    Option 2
+                  </label>
+
+                  <div class="option-input">
+
+                    <span>
+                      B
+                    </span>
+
+                    <input
+                      type="text"
+                      id="opt2"
+                      placeholder="Option 2"
+                      required
+                    >
+
+                  </div>
+
+                </div>
+
+
+                <div class="form-group option-field">
+
+                  <label for="opt3">
+                    Option 3
+                  </label>
+
+                  <div class="option-input">
+
+                    <span>
+                      C
+                    </span>
+
+                    <input
+                      type="text"
+                      id="opt3"
+                      placeholder="Option 3"
+                      required
+                    >
+
+                  </div>
+
+                </div>
+
+
+                <div class="form-group option-field">
+
+                  <label for="opt4">
+                    Option 4
+                  </label>
+
+                  <div class="option-input">
+
+                    <span>
+                      D
+                    </span>
+
+                    <input
+                      type="text"
+                      id="opt4"
+                      placeholder="Option 4"
+                      required
+                    >
+
+                  </div>
+
+                </div>
+
+
+              </div>
+
+
+              <div class="form-section-title">
+
+                <span>
+                  03
+                </span>
+
+                <div>
+
+                  <h3>
+                    Correct Answer
+                  </h3>
+
+                  <p>
+                    Select which option is correct.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="form-grid">
+
+
+                <div class="form-group">
+
+                  <label for="newCorrect">
+                    Correct Index
+                  </label>
+
+                  <select id="newCorrect" required>
+
+                    <option value="0">
+                      Option 1 — A
+                    </option>
+
+                    <option value="1">
+                      Option 2 — B
+                    </option>
+
+                    <option value="2">
+                      Option 3 — C
+                    </option>
+
+                    <option value="3">
+                      Option 4 — D
+                    </option>
+
+                  </select>
+
+                  <small class="field-help">
+                    0 = Option 1, 1 = Option 2,
+                    2 = Option 3, 3 = Option 4.
+                  </small>
+
+                </div>
+
+
+              </div>
+
+
+              <div class="form-section-title">
+
+                <span>
+                  04
+                </span>
+
+                <div>
+
+                  <h3>
+                    Explanation
+                  </h3>
+
+                  <p>
+                    Optional explanation shown during review.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="newExplanation">
+                  Explanation
+                </label>
+
+                <textarea
+                  id="newExplanation"
+                  rows="5"
+                  placeholder="Explain why the answer is correct..."
+                ></textarea>
+
+              </div>
+
+
+              <div class="form-actions">
+
+                <button
+                  type="button"
+                  id="clearQuestionBtn"
+                  class="btn btn-secondary"
+                >
+                  Clear
+                </button>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                >
+                  Save Question
+                </button>
+
+              </div>
+
+
+            </form>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             USERS
+             =============================================== -->
+
+        <section
+          id="users"
+          class="admin-section"
+          data-section-content="users"
+        >
+
+          <div class="section-intro">
+
+            <div>
+
+              <h2>
+                Registered Users
+              </h2>
+
+              <p>
+                View student accounts registered on the platform.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="filter-toolbar">
+
+            <div class="search-box">
+
+              <span>
+                🔍
+              </span>
+
+              <input
+                type="search"
+                id="userSearch"
+                placeholder="Search users..."
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="dashboard-card">
+
+            <div class="table-wrapper">
+
+              <table class="admin-table">
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Name
+                    </th>
+
+                    <th>
+                      Username
+                    </th>
+
+                    <th>
+                      Created
+                    </th>
+
+                    <th>
+                      Status
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody
+                  id="usersTableBody"
+                >
+
+                  <tr>
+
+                    <td colspan="4">
+
+                      <div class="table-loading">
+                        Loading users...
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             RESULTS
+             =============================================== -->
+
+        <section
+          id="results"
+          class="admin-section"
+          data-section-content="results"
+        >
+
+          <div class="section-intro">
+
+            <div>
+
+              <h2>
+                Quiz Results
+              </h2>
+
+              <p>
+                Review student quiz performance.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="filter-toolbar">
+
+            <div class="search-box">
+
+              <span>
+                🔍
+              </span>
+
+              <input
+                type="search"
+                id="resultSearch"
+                placeholder="Search results..."
+              >
+
+            </div>
+
+
+            <select
+              id="resultCategoryFilter"
+              class="filter-select"
+            >
+
+              <option value="all">
+                All Categories
+              </option>
+
+              <option value="General Knowledge">
+                General Knowledge
+              </option>
+
+              <option value="Competitive Exams">
+                Competitive Exams
+              </option>
+
+              <option value="NCSM">
+                NCSM
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="dashboard-card">
+
+            <div class="table-wrapper">
+
+              <table class="admin-table">
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Student
+                    </th>
+
+                    <th>
+                      Category
+                    </th>
+
+                    <th>
+                      Subject
+                    </th>
+
+                    <th>
+                      Score
+                    </th>
+
+                    <th>
+                      Percentage
+                    </th>
+
+                    <th>
+                      Date
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody
+                  id="resultsTableBody"
+                >
+
+                  <tr>
+
+                    <td colspan="6">
+
+                      <div class="table-loading">
+                        Loading results...
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             IMPORT / EXPORT
+             =============================================== -->
+
+        <section
+          id="importExport"
+          class="admin-section"
+          data-section-content="importExport"
+        >
+
+          <div class="section-intro">
+
+            <div>
+
+              <h2>
+                Import / Export
+              </h2>
+
+              <p>
+                Manage your question bank using JSON files.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="import-export-grid">
+
+
+            <!-- Import -->
+
+            <div class="form-card">
+
+              <div class="card-header">
+
+                <div>
+
+                  <h3>
+                    Import Questions
+                  </h3>
+
+                  <p>
+                    Add multiple questions at once.
+                  </p>
+
+                </div>
+
+                <span class="card-icon">
+                  ↓
+                </span>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="importTextarea">
+                  JSON Array
+                </label>
+
+                <textarea
+                  id="importTextarea"
+                  rows="15"
+                  placeholder='[
+  {
+    "question": "What is 2 + 2?",
+    "options": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "correct": 1,
+    "category": "NCSM",
+    "subject": "Mathematics",
+    "explanation": "2 + 2 = 4."
+  }
+]'
+                ></textarea>
+
+              </div>
+
+
+              <button
+                id="importBtn"
+                class="btn btn-primary"
+                type="button"
+              >
+                Import JSON
+              </button>
+
+            </div>
+
+
+            <!-- Export -->
+
+            <div class="form-card">
+
+              <div class="card-header">
+
+                <div>
+
+                  <h3>
+                    Export Questions
+                  </h3>
+
+                  <p>
+                    Download your complete question bank.
+                  </p>
+
+                </div>
+
+                <span class="card-icon">
+                  ↑
+                </span>
+
+              </div>
+
+
+              <div class="export-info">
+
+                <div class="export-stat">
+
+                  <strong id="exportQuestionCount">
+                    0
+                  </strong>
+
+                  <span>
+                    Questions available
+                  </span>
+
+                </div>
+
+
+                <div class="export-format">
+
+                  <span>
+                    Format
+                  </span>
+
+                  <strong>
+                    JSON
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <button
+                id="exportBtn"
+                class="btn btn-secondary"
+                type="button"
+              >
+                Export All Questions
+              </button>
+
+            </div>
+
+
+          </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             SETTINGS
+             =============================================== -->
+
+        <section
+          id="settings"
+          class="admin-section"
+          data-section-content="settings"
+        >
+
+          <div class="section-intro">
+
+            <div>
+
+              <h2>
+                Account Settings
+              </h2>
+
+              <p>
+                View your administrator account information.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="settings-grid">
+
+
+            <div class="form-card">
+
+              <div class="card-header">
+
+                <div>
+
+                  <h3>
+                    Administrator Account
+                  </h3>
+
+                  <p>
+                    Current Firebase Authentication account
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="account-details">
+
+
+                <div class="account-detail">
+
+                  <span>
+                    Name
+                  </span>
+
+                  <strong
+                    id="settingsAdminName"
+                  >
+                    Administrator
+                  </strong>
+
+                </div>
+
+
+                <div class="account-detail">
+
+                  <span>
+                    Email
+                  </span>
+
+                  <strong
+                    id="settingsAdminEmail"
+                  >
+                    -
+                  </strong>
+
+                </div>
+
+
+                <div class="account-detail">
+
+                  <span>
+                    Role
+                  </span>
+
+                  <strong
+                    id="settingsAdminRole"
+                  >
+                    Admin
+                  </strong>
+
+                </div>
+
+
+                <div class="account-detail">
+
+                  <span>
+                    Account Status
+                  </span>
+
+                  <strong
+                    id="settingsAdminStatus"
+                    class="status-text active"
+                  >
+                    Active
+                  </strong>
+
+                </div>
+
+
+                <div class="account-detail">
+
+                  <span>
+                    Authentication
+                  </span>
+
+                  <strong>
+                    Firebase Authentication
+                  </strong>
+
+                </div>
+
+
+                <div class="account-detail">
+
+                  <span>
+                    User ID
+                  </span>
+
+                  <code
+                    id="settingsAdminUid"
+                  >
+                    -
+                  </code>
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+
+            <div class="form-card security-card">
+
+              <div class="card-header">
+
+                <div>
+
+                  <h3>
+                    Security
+                  </h3>
+
+                  <p>
+                    Information about administrator protection
+                  </p>
+
+                </div>
+
+                <span class="card-icon">
+                  🔐
+                </span>
+
+              </div>
+
+
+              <div class="security-list">
+
+
+                <div class="security-item">
+
+                  <span class="security-check">
+                    ✓
+                  </span>
+
+                  <div>
+
+                    <strong>
+                      Firebase Authentication
+                    </strong>
+
+                    <p>
+                      Identity is verified by Firebase.
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                <div class="security-item">
+
+                  <span class="security-check">
+                    ✓
+                  </span>
+
+                  <div>
+
+                    <strong>
+                      Firestore Authorization
+                    </strong>
+
+                    <p>
+                      Administrative access is controlled
+                      through Firestore.
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                <div class="security-item">
+
+                  <span class="security-check">
+                    ✓
+                  </span>
+
+                  <div>
+
+                    <strong>
+                      Protected Session
+                    </strong>
+
+                    <p>
+                      Authentication state is managed by
+                      Firebase.
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+
+          </div>
+
+
+          <div class="danger-zone">
+
+            <div>
+
+              <h3>
+                Sign Out
+              </h3>
+
+              <p>
+                End your administrator session on this device.
+              </p>
+
+            </div>
+
+            <button
+              id="settingsLogoutBtn"
+              class="btn btn-danger"
+              type="button"
+            >
+              Sign Out
+            </button>
+
+          </div>
+
+        </section>
+
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       NOTIFICATION PANEL
+       ===================================================== -->
+
+  <div
+    id="notificationPanel"
+    class="notification-panel hidden"
+  >
+
+    <div class="notification-panel-header">
+
+      <strong>
+        Notifications
+      </strong>
+
+      <button
+        id="closeNotificationBtn"
+        type="button"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="notificationContainer"
+      class="notification-container"
+    >
+
+      <div class="empty-state">
+
+        <div class="empty-state-icon">
+          ♢
+        </div>
+
+        <p>
+          No new notifications.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       DELETE / CONFIRM MODAL
+       ===================================================== -->
+
+  <div
+    id="adminConfirmModal"
+    class="modal hidden"
+  >
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-card">
+
+      <button
+        class="modal-close"
+        type="button"
+      >
+        ×
+      </button>
+
+      <div class="modal-icon danger">
+        !
+      </div>
+
+      <h2 id="confirmModalTitle">
+        Confirm Action
+      </h2>
+
+      <p id="confirmModalMessage">
+        Are you sure?
+      </p>
+
+      <div class="modal-actions">
+
+        <button
+          id="cancelConfirmBtn"
+          class="btn btn-secondary"
+          type="button"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="confirmActionBtn"
+          class="btn btn-danger"
+          type="button"
+        >
+          Confirm
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       GLOBAL TOAST
+       ===================================================== -->
+
+  <div
+    id="adminToast"
+    class="admin-toast hidden"
+  >
+
+    <div class="toast-icon">
+      ✓
+    </div>
+
+    <div>
+
+      <strong>
+        Admin
+      </strong>
+
+      <p>
+        Action completed.
+      </p>
+
+    </div>
+
+    <button
+      id="closeToastBtn"
+      type="button"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       FIREBASE SDK
+       ===================================================== -->
+
+  <script
+    src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"
+  ></script>
+
+  <script
+    src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"
+  ></script>
+
+  <script
+    src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"
+  ></script>
+
+
+  <!-- =====================================================
+       ADMIN JAVASCRIPT
+       ===================================================== -->
+
+  <script src="admin.js" defer></script>
+
+</body>
+</html>
