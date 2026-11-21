@@ -1871,6 +1871,81 @@ a {
   vertical-align: middle;
 }
 
+.selection-cell {
+  width: 42px;
+  text-align: center !important;
+}
+
+.selection-cell input {
+  appearance: none;
+  position: relative;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border: 1px solid #94a3b8;
+  border-radius: 3px;
+  background: #fff;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.selection-cell input::after {
+  content: "";
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -60%) rotate(45deg) scale(0);
+  transition: transform 140ms ease-out;
+}
+
+.selection-cell input:checked,
+.selection-cell input:indeterminate {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.selection-cell input:checked::after {
+  transform: translate(-50%, -60%) rotate(45deg) scale(1);
+}
+
+.selection-cell input:indeterminate::after {
+  top: 50%;
+  width: 8px;
+  height: 2px;
+  border: 0;
+  border-radius: 1px;
+  background: #fff;
+  transform: translate(-50%, -50%) scaleX(1);
+}
+
+.selection-cell input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selection-cell input,
+  .selection-cell input::after {
+    transition: none;
+  }
+}
+
+.selection-count {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .admin-table tbody tr:hover {
   background: #fafbff;
 }
