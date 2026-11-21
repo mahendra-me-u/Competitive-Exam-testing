@@ -42,13 +42,92 @@ const NCSM_SUBJECTS = [
    FIVE DEMO CHAPTERS FOR EVERY SUBJECT
    ========================================================= */
 
-const NCSM_CHAPTERS = [
-  "Chapter 1 - Basic Concepts",
-  "Chapter 2 - Fundamentals",
-  "Chapter 3 - Intermediate Practice",
-  "Chapter 4 - Advanced Practice",
-  "Chapter 5 - Revision Test"
-];
+const NCSM_CHAPTERS = {
+  "GK/CA": [
+    "National Parks",
+    "Country, Capital & Currency 361-365 | দেশ, রাজধানী ও মুদ্রা",
+    "Important Festivals & Fairs 366-371 | গুরুত্বপূর্ণ উৎসব ও মেলা",
+    "Famous Musicians & Their Instruments 372-377 | বিখ্যাত সংগীতশিল্পী ও তাঁদের বাদ্যযন্ত্র",
+    "Inventions & Their Inventors"
+  ],
+  "Mathematics": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Reasoning": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "English": [
+    "Chapter 1 - Prepositions",
+    "Chapter 2 - Group Verbs",
+    "Chapter 3 - Conjunction and Interjection",
+    "Chapter 4 - Question Tags & Foreign Words",
+    "Chapter 5 - Misc. Error Detection"
+  ],
+  "Polity": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Economics": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Geography": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "History": [
+    "Chapter 1 - Maurya Empire (মৌর্য সাম্রাজ্য)",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Biology": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Chemistry": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Physics": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "1ST MOCK TEST": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ]
+};
 
 
 /* =========================================================
@@ -78,6 +157,8 @@ let lastQuizResult = null;
 let allQuestionsCache = [];
 
 let firebaseReady = false;
+let ncsmQuestionCountsLoaded = false;
+let ncsmQuestionCountsLoading = false;
 
 
 /* =========================================================
@@ -1145,6 +1226,11 @@ function setupNCSMSubjectSelector() {
         "chapters-" +
         index;
 
+      const subjectQuestions =
+        allQuestionsCache.filter(
+          question => question.subject === subject
+        );
+
 
       card.innerHTML = `
 
@@ -1161,7 +1247,11 @@ function setupNCSMSubjectSelector() {
             </h3>
 
             <p>
-              5 chapters available
+              ${ncsmQuestionCountsLoaded
+                ? `${subjectQuestions.length} questions available`
+                : ncsmQuestionCountsLoading
+                  ? "Checking question availability..."
+                  : "Question availability not checked"}
             </p>
 
           </div>
@@ -1181,8 +1271,16 @@ function setupNCSMSubjectSelector() {
           id="${chapterId}"
         >
 
-          ${NCSM_CHAPTERS.map(
-            (chapter, chapterIndex) => `
+          ${(NCSM_CHAPTERS[subject] || []).map(
+            (chapter, chapterIndex) => {
+              const questionCount = subjectQuestions.filter(
+                question => question.chapter === chapter
+              ).length;
+              const isEmpty =
+                ncsmQuestionCountsLoaded && questionCount === 0;
+              const isChecking = ncsmQuestionCountsLoading;
+
+              return `
 
               <div class="chapter-card">
 
@@ -1199,7 +1297,13 @@ function setupNCSMSubjectSelector() {
                     </strong>
 
                     <small>
-                      Demo chapter
+                      ${ncsmQuestionCountsLoaded
+                        ? isEmpty
+                          ? "No questions yet"
+                          : `${questionCount} ${questionCount === 1 ? "question" : "questions"}`
+                        : isChecking
+                          ? "Checking availability..."
+                          : "Question count unavailable"}
                     </small>
 
                   </div>
@@ -1211,13 +1315,15 @@ function setupNCSMSubjectSelector() {
                   class="btn btn-primary chapter-start-btn"
                   data-subject="${escapeHTML(subject)}"
                   data-chapter="${escapeHTML(chapter)}"
+                  ${isEmpty || isChecking ? "disabled" : ""}
                 >
-                  Start
+                  ${isEmpty ? "Unavailable" : isChecking ? "Checking..." : "Start"}
                 </button>
 
               </div>
 
-            `
+            `;
+            }
           ).join("")}
 
         </div>
@@ -1313,6 +1419,45 @@ function openNCSM() {
 
 
   showScreen("ncsmScreen");
+
+  loadNCSMQuestionCounts();
+
+}
+
+
+async function loadNCSMQuestionCounts() {
+
+  if (!firebaseReady || !db) {
+    ncsmQuestionCountsLoaded = false;
+    ncsmQuestionCountsLoading = false;
+    setupNCSMSubjectSelector();
+    return;
+  }
+
+  ncsmQuestionCountsLoading = true;
+  setupNCSMSubjectSelector();
+
+  try {
+    const snapshot = await db
+      .collection("questions")
+      .where("category", "==", "NCSM")
+      .get();
+
+    allQuestionsCache = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    ncsmQuestionCountsLoaded = true;
+
+  } catch (error) {
+    console.error("NCSM question count loading error:", error);
+    ncsmQuestionCountsLoaded = false;
+
+  } finally {
+    ncsmQuestionCountsLoading = false;
+    setupNCSMSubjectSelector();
+  }
 
 }
 
@@ -1450,6 +1595,11 @@ async function startQuiz(
           })
         );
 
+      if (category === "NCSM") {
+        allQuestionsCache = questions;
+        ncsmQuestionCountsLoaded = true;
+      }
+
     }
 
 
@@ -1485,14 +1635,11 @@ async function startQuiz(
     }
 
 
-    /*
-     * Shuffle
-     */
-
-    questions =
-      shuffleArray(
-        questions
-      );
+    if (category === "NCSM") {
+      questions = sortQuestionsByOrder(questions);
+    } else {
+      questions = shuffleArray(questions);
+    }
 
 
     /*
@@ -1500,9 +1647,7 @@ async function startQuiz(
      */
 
     const questionLimit =
-      mode === "practice"
-        ? 10
-        : 20;
+      questions.length;
 
 
     currentQuiz =
@@ -1520,6 +1665,11 @@ async function startQuiz(
     if (
       currentQuiz.length === 0
     ) {
+
+      if (category === "NCSM") {
+        await openNCSM();
+        return;
+      }
 
       currentQuiz =
         createDemoQuestions(
@@ -1575,6 +1725,11 @@ async function startQuiz(
       error
     );
 
+    if (category === "NCSM") {
+      await openNCSM();
+      return;
+    }
+
 
     currentQuiz =
       createDemoQuestions(
@@ -1600,6 +1755,58 @@ async function startQuiz(
     renderQuestion();
 
   }
+
+}
+
+
+function getQuestionOrderValue(question) {
+
+  if (
+    question.order !== undefined &&
+    question.order !== null &&
+    question.order !== "" &&
+    Number.isFinite(Number(question.order))
+  ) {
+    return Number(question.order);
+  }
+
+  const createdAt = question.createdAt;
+
+  if (typeof createdAt?.toMillis === "function") {
+    return createdAt.toMillis();
+  }
+
+  if (createdAt instanceof Date) {
+    return createdAt.getTime();
+  }
+
+  if (typeof createdAt === "string") {
+    const timestamp = Date.parse(createdAt);
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  }
+
+  return 0;
+
+}
+
+
+function sortQuestionsByOrder(questions) {
+
+  return [...questions].sort((first, second) => {
+
+    const orderDifference =
+      getQuestionOrderValue(first) -
+      getQuestionOrderValue(second);
+
+    if (orderDifference !== 0) {
+      return orderDifference;
+    }
+
+    return String(first.id || "").localeCompare(
+      String(second.id || "")
+    );
+
+  });
 
 }
 
@@ -2475,7 +2682,11 @@ function exitQuiz() {
 
   if (shouldExit) {
 
-    openDashboard();
+    if (currentCategory === "NCSM") {
+      showScreen("ncsmScreen");
+    } else {
+      openDashboard();
+    }
 
   }
 
@@ -3268,7 +3479,7 @@ function populateAdminChapters() {
     </option>`;
 
 
-  NCSM_CHAPTERS.forEach(
+  NCSM_CHAPTERS[currentUser.subject].forEach(
     chapter => {
 
       const option =
