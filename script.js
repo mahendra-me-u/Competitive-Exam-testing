@@ -44,23 +44,23 @@ const NCSM_SUBJECTS = [
 
 const NCSM_CHAPTERS = {
   "GK/CA": [
-    "National Parks",
-    "Country, Capital & Currency 361-365 | দেশ, রাজধানী ও মুদ্রা",
-    "Important Festivals & Fairs 366-371 | গুরুত্বপূর্ণ উৎসব ও মেলা",
-    "Famous Musicians & Their Instruments 372-377 | বিখ্যাত সংগীতশিল্পী ও তাঁদের বাদ্যযন্ত্র",
-    "Inventions & Their Inventors"
+    "Chapter 1 - National Park (জাতীয় উদ্যান)",
+    "Chapter 2 - Country, Capital & Currency (দেশ, রাজধানী ও মুদ্রা)",
+    "Chapter 3 - Important Festivals and Fairs (গুরুত্বপূর্ণ উৎসব ও মেলা)",
+    "Chapter 4 - Famous Musicians & Their Instruments (বিখ্যাত সংগীতশিল্পী ও তাঁদের বাদ্যযন্ত্র)",
+    "Chapter 5 - Inventions & Their Inventors (আবিষ্কার ও আবিষ্কারক)"
   ],
   "Mathematics": [
-    "Chapter 1 - Basic Concepts",
-    "Chapter 2 - Fundamentals",
-    "Chapter 3 - Intermediate Practice",
-    "Chapter 4 - Advanced Practice",
+    "Chapter 1 - Time & Work (সময় ও কার্য)",
+    "Chapter 2 - Pipe & Cistern (নল এবং চৌবাচ্চা)",
+    "Chapter 3 - Time & Distance (সময় এবং দূরত্ব)",
+    "Chapter 4 - Time & Distance Related to Trains (ট্রেন সংক্রান্ত সময় ও দূরত্ব)",
     "Chapter 5 - Revision Test"
   ],
   "Reasoning": [
-    "Chapter 1 - Basic Concepts",
-    "Chapter 2 - Fundamentals",
-    "Chapter 3 - Intermediate Practice",
+    "Chapter 1 - Classification",
+    "Chapter 2 - Calendar",
+    "Chapter 3 - Clock",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
@@ -72,21 +72,21 @@ const NCSM_CHAPTERS = {
     "Chapter 5 - Misc. Error Detection"
   ],
   "Polity": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Fundamental Rights, DPSP & Fundamental Duties (মৌলিক অধিকার, নির্দেশমূলক নীতি এবং মৌলিক কর্তব্য)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Economics": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - National Income (জাতীয় আয়)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Geography": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Drainage System of India (ভারতের নদ-নদী ও জলনির্গমন প্রণালী)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
@@ -94,27 +94,27 @@ const NCSM_CHAPTERS = {
   ],
   "History": [
     "Chapter 1 - Maurya Empire (মৌর্য সাম্রাজ্য)",
-    "Chapter 2 - Fundamentals",
-    "Chapter 3 - Intermediate Practice",
+    "Chapter 2 - Kushan Empire (কুশান সাম্রাজ্য)",
+    "Chapter 3 - Gupta Dynasty (গুপ্ত বংশ)",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Biology": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Tissues (Plant & Animal), Transpiration & Nitrogen Cycle (কলা (উদ্ভিদ ও প্রাণী), প্রস্বেদন এবং নাইট্রোজেন চক্র)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Chemistry": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Periodic Table (পর্যায় সারণী)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Physics": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Gravitation (মহাকর্ষ)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
