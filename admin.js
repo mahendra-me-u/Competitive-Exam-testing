@@ -39,6 +39,100 @@ const NCSM_SUBJECTS = [
   "1ST MOCK TEST"
 ];
 
+const QUESTION_CATEGORIES = [
+  "General Knowledge",
+  "Competitive Exams",
+  "NCSM"
+];
+
+
+const NCSM_CHAPTERS = {
+  "GK/CA": [
+    "National Parks",
+    "Country, Capital & Currency 361-365 | দেশ, রাজধানী ও মুদ্রা",
+    "Important Festivals & Fairs 366-371 | গুরুত্বপূর্ণ উৎসব ও মেলা",
+    "Famous Musicians & Their Instruments 372-377 | বিখ্যাত সংগীতশিল্পী ও তাঁদের বাদ্যযন্ত্র",
+    "Inventions & Their Inventors"
+  ],
+  "Mathematics": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Reasoning": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "English": [
+    "Chapter 1 - Prepositions",
+    "Chapter 2 - Group Verbs",
+    "Chapter 3 - Conjunction and Interjection",
+    "Chapter 4 - Question Tags & Foreign Words",
+    "Chapter 5 - Misc. Error Detection"
+  ],
+  "Polity": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Economics": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Geography": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "History": [
+    "Chapter 1 - Maurya Empire (মৌর্য সাম্রাজ্য)",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Biology": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Chemistry": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "Physics": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ],
+  "1ST MOCK TEST": [
+    "Chapter 1 - Basic Concepts",
+    "Chapter 2 - Fundamentals",
+    "Chapter 3 - Intermediate Practice",
+    "Chapter 4 - Advanced Practice",
+    "Chapter 5 - Revision Test"
+  ]
+};
+
 
 /* =========================================================
    GLOBAL VARIABLES
@@ -52,6 +146,7 @@ let currentAdminData = null;
 let allQuestions = [];
 let allUsers = [];
 let allResults = [];
+const selectedQuestionIds = new Set();
 
 let editingQuestionId = null;
 let pendingConfirmAction = null;
@@ -837,6 +932,18 @@ async function loadQuestions() {
 
     });
 
+    allQuestions = sortQuestionsByOrder(allQuestions);
+
+    const loadedQuestionIds = new Set(
+      allQuestions.map(question => question.id)
+    );
+
+    selectedQuestionIds.forEach(questionId => {
+      if (!loadedQuestionIds.has(questionId)) {
+        selectedQuestionIds.delete(questionId);
+      }
+    });
+
     console.log(
       `Loaded ${allQuestions.length} questions.`
     );
@@ -893,6 +1000,16 @@ function renderQuestionsTable() {
       .getElementById("questionCategoryFilter")
       ?.value || "all";
 
+  const subject =
+    document
+      .getElementById("questionSubjectFilter")
+      ?.value || "all";
+
+  const chapter =
+    document
+      .getElementById("questionChapterFilter")
+      ?.value || "all";
+
 
   let questions =
     [...allQuestions];
@@ -913,9 +1030,15 @@ function renderQuestionsTable() {
             question.subject || ""
           ).toLowerCase();
 
+        const chapter =
+          String(
+            question.chapter || ""
+          ).toLowerCase();
+
         return (
           text.includes(search) ||
-          subject.includes(search)
+          subject.includes(search) ||
+          chapter.includes(search)
         );
 
       });
@@ -934,11 +1057,29 @@ function renderQuestionsTable() {
   }
 
 
+  if (category === "NCSM" && subject !== "all") {
+
+    questions = questions.filter(
+      question => question.subject === subject
+    );
+
+  }
+
+
+  if (category === "NCSM" && chapter !== "all") {
+
+    questions = questions.filter(
+      question => question.chapter === chapter
+    );
+
+  }
+
+
   if (!questions.length) {
 
     tbody.innerHTML = `
       <tr>
-        <td colspan="5">
+        <td colspan="6">
           <div class="empty-state">
             <div class="empty-state-icon">☷</div>
             <h3>No questions found</h3>
@@ -950,6 +1091,8 @@ function renderQuestionsTable() {
       </tr>
     `;
 
+    updateQuestionSelectionUI([]);
+
     return;
   }
 
@@ -960,6 +1103,8 @@ function renderQuestionsTable() {
         createQuestionRow(question)
       )
       .join("");
+
+  updateQuestionSelectionUI(questions);
 
 }
 
@@ -996,6 +1141,15 @@ function createQuestionRow(question) {
   return `
     <tr>
 
+      <td class="selection-cell">
+        <input
+          type="checkbox"
+          data-select-question="${escapeHTML(question.id)}"
+          aria-label="Select question"
+          ${selectedQuestionIds.has(question.id) ? "checked" : ""}
+        >
+      </td>
+
       <td>
         <div class="question-preview">
           ${questionText}
@@ -1025,7 +1179,7 @@ function createQuestionRow(question) {
           <button
             class="table-action-btn edit"
             type="button"
-            data-edit-question="${question.id}"
+            data-edit-question="${escapeHTML(question.id)}"
             title="Edit"
           >
             ✎
@@ -1034,7 +1188,7 @@ function createQuestionRow(question) {
           <button
             class="table-action-btn delete"
             type="button"
-            data-delete-question="${question.id}"
+            data-delete-question="${escapeHTML(question.id)}"
             title="Delete"
           >
             ×
@@ -1046,6 +1200,42 @@ function createQuestionRow(question) {
 
     </tr>
   `;
+
+}
+
+
+function updateQuestionSelectionUI(visibleQuestions) {
+
+  const selectedCount = selectedQuestionIds.size;
+  const selectAll = document.getElementById("selectAllQuestions");
+  const count = document.getElementById("questionSelectionCount");
+  const clearButton = document.getElementById("clearQuestionSelectionBtn");
+  const deleteButton = document.getElementById("deleteSelectedQuestionsBtn");
+  const visibleSelectedCount = visibleQuestions.filter(question =>
+    selectedQuestionIds.has(question.id)
+  ).length;
+
+  if (count) {
+    count.textContent = `${selectedCount} selected`;
+  }
+
+  if (clearButton) {
+    clearButton.disabled = selectedCount === 0;
+  }
+
+  if (deleteButton) {
+    deleteButton.disabled = selectedCount === 0;
+  }
+
+  if (selectAll) {
+    selectAll.checked =
+      visibleQuestions.length > 0 &&
+      visibleSelectedCount === visibleQuestions.length;
+    selectAll.indeterminate =
+      visibleSelectedCount > 0 &&
+      visibleSelectedCount < visibleQuestions.length;
+    selectAll.disabled = visibleQuestions.length === 0;
+  }
 
 }
 
@@ -1066,15 +1256,18 @@ function updateQuestionFilters() {
   const current =
     select.value;
 
-  const categories =
-    [
-      ...new Set(
-        allQuestions
-          .map(q => q.category)
-          .filter(Boolean)
-      )
-    ]
-    .sort();
+  const additionalCategories = [
+    ...new Set(
+      allQuestions
+        .map(question => question.category)
+        .filter(category => category && !QUESTION_CATEGORIES.includes(category))
+    )
+  ].sort();
+
+  const categories = [
+    ...QUESTION_CATEGORIES,
+    ...additionalCategories
+  ];
 
 
   select.innerHTML = `
@@ -1101,6 +1294,84 @@ function updateQuestionFilters() {
   ) {
     select.value = current;
   }
+
+  updateQuestionSubfilters();
+
+}
+
+
+function updateQuestionSubfilters() {
+
+  const category =
+    document.getElementById("questionCategoryFilter")?.value || "all";
+
+  const subjectSelect =
+    document.getElementById("questionSubjectFilter");
+
+  const chapterSelect =
+    document.getElementById("questionChapterFilter");
+
+  if (!subjectSelect || !chapterSelect) return;
+
+  const currentSubject = subjectSelect.value;
+  const subjects = [
+    ...new Set([
+      ...NCSM_SUBJECTS,
+      ...allQuestions
+        .filter(question => question.category === "NCSM")
+        .map(question => question.subject)
+        .filter(Boolean)
+    ])
+  ];
+
+  subjectSelect.innerHTML = "<option value=\"all\">All NCSM Subjects</option>";
+
+  subjects.forEach(subject => {
+    const option = document.createElement("option");
+    option.value = subject;
+    option.textContent = subject;
+    subjectSelect.appendChild(option);
+  });
+
+  subjectSelect.value = subjects.includes(currentSubject)
+    ? currentSubject
+    : "all";
+
+  const selectedSubject = subjectSelect.value;
+  const currentChapter = chapterSelect.value;
+  const chapters = selectedSubject === "all"
+    ? []
+    : [
+        ...new Set([
+          ...(NCSM_CHAPTERS[selectedSubject] || []),
+          ...allQuestions
+            .filter(question =>
+              question.category === "NCSM" &&
+              question.subject === selectedSubject
+            )
+            .map(question => question.chapter)
+            .filter(Boolean)
+        ])
+      ];
+
+  chapterSelect.innerHTML = "<option value=\"all\">All Chapters</option>";
+
+  chapters.forEach(chapter => {
+    const option = document.createElement("option");
+    option.value = chapter;
+    option.textContent = chapter;
+    chapterSelect.appendChild(option);
+  });
+
+  chapterSelect.value = chapters.includes(currentChapter)
+    ? currentChapter
+    : "all";
+
+  subjectSelect.classList.toggle("hidden", category !== "NCSM");
+  chapterSelect.classList.toggle(
+    "hidden",
+    category !== "NCSM" || selectedSubject === "all"
+  );
 
 }
 
@@ -1137,38 +1408,76 @@ function populateNCSMSubjects() {
 }
 
 
+function populateNCSMChapters() {
+
+  const subjectSelect = document.getElementById("newSubject");
+  const chapterSelect = document.getElementById("newChapter");
+
+  if (!chapterSelect) return;
+
+  const subject = subjectSelect?.value || "Mathematics";
+  const chapters = NCSM_CHAPTERS[subject] || [];
+
+  chapterSelect.innerHTML = `
+    <option value="">
+      Select NCSM Chapter
+    </option>
+  `;
+
+  chapters.forEach(chapter => {
+
+    const option = document.createElement("option");
+
+    option.value = chapter;
+    option.textContent = chapter;
+
+    chapterSelect.appendChild(option);
+
+  });
+
+}
+
+
 /* =========================================================
-   CATEGORY / SUBJECT LOGIC
+   CATEGORY / SUBJECT / CHAPTER LOGIC
    ========================================================= */
 
 function handleCategoryChange() {
 
   const category =
-    document.getElementById(
-      "newCategory"
-    )?.value;
+    document.getElementById("newCategory")?.value;
 
   const subjectGroup =
-    document.getElementById(
-      "subjectGroup"
-    );
+    document.getElementById("subjectGroup");
+
+  const chapterGroup =
+    document.getElementById("chapterGroup");
 
   const subject =
-    document.getElementById(
-      "newSubject"
-    );
+    document.getElementById("newSubject");
 
-  if (
-    category === "NCSM"
-  ) {
+  const chapter =
+    document.getElementById("newChapter");
+
+  if (category === "NCSM") {
 
     if (subjectGroup) {
       subjectGroup.classList.remove("hidden");
     }
 
+    if (chapterGroup) {
+      chapterGroup.classList.remove("hidden");
+    }
+
     if (subject) {
       subject.required = true;
     }
+
+    if (chapter) {
+      chapter.required = true;
+    }
+
+    populateNCSMChapters();
 
   } else {
 
@@ -1176,9 +1485,18 @@ function handleCategoryChange() {
       subjectGroup.classList.add("hidden");
     }
 
+    if (chapterGroup) {
+      chapterGroup.classList.add("hidden");
+    }
+
     if (subject) {
       subject.required = false;
       subject.value = "";
+    }
+
+    if (chapter) {
+      chapter.required = false;
+      chapter.value = "";
     }
 
   }
@@ -1214,6 +1532,11 @@ async function handleQuestionSubmit(event) {
   const subject =
     document.getElementById(
       "newSubject"
+    )?.value || "";
+
+  const chapter =
+    document.getElementById(
+      "newChapter"
     )?.value || "";
 
   const question =
@@ -1289,6 +1612,21 @@ async function handleQuestionSubmit(event) {
 
 
   if (
+    category === "NCSM" &&
+    !chapter
+  ) {
+
+    showToast(
+      "Chapter Required",
+      "Please select an NCSM chapter.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if (
     !Number.isInteger(correct) ||
     correct < 0 ||
     correct > 3
@@ -1324,6 +1662,11 @@ async function handleQuestionSubmit(event) {
         ? subject
         : "",
 
+    chapter:
+      category === "NCSM"
+        ? chapter
+        : "",
+
     explanation,
 
     updatedAt:
@@ -1354,6 +1697,9 @@ async function handleQuestionSubmit(event) {
 
       questionData.createdAt =
         firebase.firestore.FieldValue.serverTimestamp();
+
+      questionData.order =
+        getNextQuestionOrder();
 
       questionData.createdBy =
         currentAdmin.uid;
@@ -1422,6 +1768,11 @@ function editQuestion(questionId) {
   setValue(
     "newSubject",
     question.subject || ""
+  );
+
+  setValue(
+    "newChapter",
+    question.chapter || ""
   );
 
   setValue(
@@ -1547,6 +1898,75 @@ function requestDeleteQuestion(questionId) {
   showConfirmModal(
     "Delete Question?",
     "This question will be permanently removed from the question bank."
+  );
+
+}
+
+
+function clearQuestionSelection() {
+
+  selectedQuestionIds.clear();
+  renderQuestionsTable();
+
+}
+
+
+function requestDeleteSelectedQuestions() {
+
+  const questionIds = [...selectedQuestionIds];
+
+  if (!questionIds.length) return;
+
+  pendingConfirmAction = async () => {
+
+    try {
+
+      for (let offset = 0; offset < questionIds.length; offset += 450) {
+
+        const batch = db.batch();
+        const batchQuestionIds = questionIds.slice(offset, offset + 450);
+
+        batchQuestionIds.forEach(questionId => {
+          batch.delete(
+            db.collection("questions").doc(questionId)
+          );
+        });
+
+        await batch.commit();
+
+      }
+
+      questionIds.forEach(questionId => {
+        selectedQuestionIds.delete(questionId);
+      });
+
+      showToast(
+        "Questions Deleted",
+        `${questionIds.length} questions were permanently deleted.`,
+        "success"
+      );
+
+      await loadQuestions();
+
+    } catch (error) {
+
+      console.error("Bulk question deletion error:", error);
+
+      showToast(
+        "Delete Failed",
+        getFirebaseErrorMessage(error),
+        "error"
+      );
+
+      await loadQuestions();
+
+    }
+
+  };
+
+  showConfirmModal(
+    `Delete ${questionIds.length} selected question${questionIds.length === 1 ? "" : "s"}?`,
+    "These questions will be permanently removed from the question bank."
   );
 
 }
@@ -2334,6 +2754,42 @@ async function importQuestions() {
 
   try {
 
+    const existingSnapshot =
+      await db.collection("questions").get();
+
+    const exactMatches = new Map();
+    const looseMatches = new Map();
+    const matchedQuestionIds = new Set();
+    let nextQuestionOrder = Date.now();
+
+    existingSnapshot.forEach(doc => {
+      const existingQuestion = {
+        id: doc.id,
+        ...doc.data()
+      };
+
+      const exactKey =
+        getQuestionIdentityKey(existingQuestion);
+
+      const looseKey =
+        getQuestionIdentityKey(existingQuestion, false);
+
+      exactMatches.set(
+        exactKey,
+        [...(exactMatches.get(exactKey) || []), existingQuestion]
+      );
+
+      looseMatches.set(
+        looseKey,
+        [...(looseMatches.get(looseKey) || []), existingQuestion]
+      );
+
+      nextQuestionOrder = Math.max(
+        nextQuestionOrder,
+        getQuestionOrderValue(existingQuestion) + 1
+      );
+    });
+
     let batch =
       db.batch();
 
@@ -2374,22 +2830,24 @@ async function importQuestions() {
 
         category,
 
+        order:
+          nextQuestionOrder++,
+
         subject:
           category === "NCSM"
             ? String(question.subject || "")
             : "",
 
+        chapter:
+          category === "NCSM"
+            ? String(question.chapter || "")
+            : "",
+
         explanation:
           String(question.explanation || ""),
 
-        createdAt:
-          firebase.firestore.FieldValue.serverTimestamp(),
-
         updatedAt:
           firebase.firestore.FieldValue.serverTimestamp(),
-
-        createdBy:
-          currentAdmin.uid,
 
         updatedBy:
           currentAdmin.uid
@@ -2397,10 +2855,49 @@ async function importQuestions() {
       };
 
 
-      const ref =
-        db.collection("questions").doc();
+      const exactKey =
+        getQuestionIdentityKey(data);
 
-      batch.set(ref, data);
+      const looseKey =
+        getQuestionIdentityKey(data, false);
+
+      const exactCandidates = exactMatches.get(exactKey) || [];
+      let existingQuestion = null;
+
+      while (exactCandidates.length && !existingQuestion) {
+        const candidate = exactCandidates.shift();
+
+        if (!matchedQuestionIds.has(candidate.id)) {
+          existingQuestion = candidate;
+        }
+      }
+
+      if (!existingQuestion) {
+        const unmatchedLooseCandidates =
+          (looseMatches.get(looseKey) || []).filter(
+            candidate => !matchedQuestionIds.has(candidate.id)
+          );
+
+        if (unmatchedLooseCandidates.length === 1) {
+          existingQuestion = unmatchedLooseCandidates[0];
+        }
+      }
+
+      const ref = existingQuestion
+        ? db.collection("questions").doc(existingQuestion.id)
+        : db.collection("questions").doc();
+
+      if (existingQuestion) {
+        matchedQuestionIds.add(existingQuestion.id);
+        batch.set(ref, data, { merge: true });
+      } else {
+        batch.set(ref, {
+          ...data,
+          createdAt:
+            firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: currentAdmin.uid
+        });
+      }
 
       operationCount++;
       importedCount++;
@@ -2435,7 +2932,7 @@ async function importQuestions() {
 
     showToast(
       "Import Complete",
-      `${importedCount} questions imported successfully.`,
+      `${importedCount} questions imported or updated successfully.`,
       "success"
     );
 
@@ -2497,6 +2994,9 @@ function exportQuestions() {
 
           subject:
             question.subject || "",
+
+          chapter:
+            question.chapter || "",
 
           explanation:
             question.explanation || ""
@@ -2809,6 +3309,61 @@ function initializeQuestionTableActions() {
     }
   );
 
+  document.addEventListener(
+    "change",
+    event => {
+
+      const target = event.target;
+
+      if (target.id === "selectAllQuestions") {
+
+        const visibleQuestionIds = Array.from(
+          document.querySelectorAll("[data-select-question]"),
+          checkbox => checkbox.dataset.selectQuestion
+        );
+
+        visibleQuestionIds.forEach(questionId => {
+          if (target.checked) {
+            selectedQuestionIds.add(questionId);
+          } else {
+            selectedQuestionIds.delete(questionId);
+          }
+        });
+
+      } else {
+
+        const questionId = target.dataset?.selectQuestion;
+
+        if (!questionId) return;
+
+        if (target.checked) {
+          selectedQuestionIds.add(questionId);
+        } else {
+          selectedQuestionIds.delete(questionId);
+        }
+
+      }
+
+      document
+        .querySelectorAll("[data-select-question]")
+        .forEach(checkbox => {
+          checkbox.checked = selectedQuestionIds.has(
+            checkbox.dataset.selectQuestion
+          );
+        });
+
+      const visibleQuestions = Array.from(
+        document.querySelectorAll("[data-select-question]"),
+        checkbox => allQuestions.find(
+          question => question.id === checkbox.dataset.selectQuestion
+        )
+      ).filter(Boolean);
+
+      updateQuestionSelectionUI(visibleQuestions);
+
+    }
+  );
+
 }
 
 
@@ -2842,9 +3397,37 @@ function initializeSearchEvents() {
 
     questionFilter.addEventListener(
       "change",
-      renderQuestionsTable
+      () => {
+        updateQuestionSubfilters();
+        renderQuestionsTable();
+      }
     );
 
+  }
+
+
+  const questionSubjectFilter =
+    document.getElementById("questionSubjectFilter");
+
+  if (questionSubjectFilter) {
+    questionSubjectFilter.addEventListener(
+      "change",
+      () => {
+        updateQuestionSubfilters();
+        renderQuestionsTable();
+      }
+    );
+  }
+
+
+  const questionChapterFilter =
+    document.getElementById("questionChapterFilter");
+
+  if (questionChapterFilter) {
+    questionChapterFilter.addEventListener(
+      "change",
+      renderQuestionsTable
+    );
   }
 
 
@@ -3046,6 +3629,28 @@ function initializeEventListeners() {
   }
 
 
+  const deleteSelectedQuestions =
+    document.getElementById("deleteSelectedQuestionsBtn");
+
+  if (deleteSelectedQuestions) {
+    deleteSelectedQuestions.addEventListener(
+      "click",
+      requestDeleteSelectedQuestions
+    );
+  }
+
+
+  const clearQuestionSelectionButton =
+    document.getElementById("clearQuestionSelectionBtn");
+
+  if (clearQuestionSelectionButton) {
+    clearQuestionSelectionButton.addEventListener(
+      "click",
+      clearQuestionSelection
+    );
+  }
+
+
   const confirmButton =
     document.getElementById(
       "confirmActionBtn"
@@ -3168,6 +3773,19 @@ function initializeEventListeners() {
 
   }
 
+
+  const ncsmSubject =
+    document.getElementById("newSubject");
+
+  if (ncsmSubject) {
+
+    ncsmSubject.addEventListener(
+      "change",
+      populateNCSMChapters
+    );
+
+  }
+
 }
 
 
@@ -3261,6 +3879,78 @@ function getTimestampValue(timestamp) {
   }
 
   return 0;
+
+}
+
+
+function getQuestionOrderValue(question) {
+
+  if (
+    question.order !== undefined &&
+    question.order !== null &&
+    question.order !== "" &&
+    Number.isFinite(Number(question.order))
+  ) {
+    return Number(question.order);
+  }
+
+  return getTimestampValue(question.createdAt);
+
+}
+
+
+function getQuestionIdentityKey(question, includeChapter = true) {
+
+  const identity = [
+    question.category || "",
+    question.subject || ""
+  ];
+
+  if (includeChapter) {
+    identity.push(question.chapter || "");
+  }
+
+  identity.push(question.question || "");
+
+  return JSON.stringify(
+    identity.map(value => String(value).trim())
+  );
+
+}
+
+
+function sortQuestionsByOrder(questions) {
+
+  return [...questions].sort((first, second) => {
+
+    const orderDifference =
+      getQuestionOrderValue(first) -
+      getQuestionOrderValue(second);
+
+    if (orderDifference !== 0) {
+      return orderDifference;
+    }
+
+    return String(first.id || "").localeCompare(
+      String(second.id || "")
+    );
+
+  });
+
+}
+
+
+function getNextQuestionOrder() {
+
+  const highestExistingOrder = allQuestions.reduce(
+    (highest, question) => Math.max(
+      highest,
+      getQuestionOrderValue(question)
+    ),
+    Date.now()
+  );
+
+  return highestExistingOrder + 1;
 
 }
 
@@ -3379,6 +4069,7 @@ document.addEventListener(
   () => {
 
     populateNCSMSubjects();
+    populateNCSMChapters();
 
     initializeEventListeners();
 
