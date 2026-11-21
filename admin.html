@@ -1137,6 +1137,26 @@
 
             </select>
 
+            <select
+              id="questionSubjectFilter"
+              class="filter-select hidden"
+              aria-label="Filter by NCSM subject"
+            >
+              <option value="all">
+                All NCSM Subjects
+              </option>
+            </select>
+
+            <select
+              id="questionChapterFilter"
+              class="filter-select hidden"
+              aria-label="Filter by NCSM chapter"
+            >
+              <option value="all">
+                All Chapters
+              </option>
+            </select>
+
 
             <button
               id="refreshQuestionsBtn"
@@ -1144,6 +1164,28 @@
               type="button"
             >
               ↻ Refresh
+            </button>
+
+            <span id="questionSelectionCount" class="selection-count" aria-live="polite">
+              0 selected
+            </span>
+
+            <button
+              id="clearQuestionSelectionBtn"
+              class="btn btn-secondary"
+              type="button"
+              disabled
+            >
+              Clear selection
+            </button>
+
+            <button
+              id="deleteSelectedQuestionsBtn"
+              class="btn btn-danger"
+              type="button"
+              disabled
+            >
+              Delete selected
             </button>
 
           </div>
@@ -1158,6 +1200,15 @@
                 <thead>
 
                   <tr>
+
+                    <th class="selection-cell">
+                      <input
+                        type="checkbox"
+                        id="selectAllQuestions"
+                        aria-label="Select all questions shown"
+                        title="Select all questions shown"
+                      >
+                    </th>
 
                     <th>
                       Question
@@ -1189,7 +1240,7 @@
 
                   <tr>
 
-                    <td colspan="5">
+                    <td colspan="6">
 
                       <div class="table-loading">
                         Loading questions...
@@ -1307,6 +1358,30 @@
 
                     <option value="">
                       Select NCSM Subject
+                    </option>
+
+                  </select>
+
+                  <small class="field-help">
+                    Used only for NCSM questions.
+                  </small>
+
+                </div>
+
+
+                <div
+                  class="form-group hidden"
+                  id="chapterGroup"
+                >
+
+                  <label for="newChapter">
+                    NCSM Chapter
+                  </label>
+
+                  <select id="newChapter">
+
+                    <option value="">
+                      Select NCSM Chapter
                     </option>
 
                   </select>
@@ -1888,17 +1963,18 @@
                   rows="15"
                   placeholder='[
   {
-    "question": "What is 2 + 2?",
+    "question": "The book is lying ______ the table.",
     "options": [
-      "3",
-      "4",
-      "5",
-      "6"
+      "in",
+      "at",
+      "on",
+      "upon"
     ],
-    "correct": 1,
+    "correct": 2,
     "category": "NCSM",
-    "subject": "Mathematics",
-    "explanation": "2 + 2 = 4."
+    "subject": "English",
+    "chapter": "Chapter 1 - Prepositions",
+    "explanation": "Use 'on' for something resting on a surface."
   }
 ]'
                 ></textarea>
