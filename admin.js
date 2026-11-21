@@ -48,23 +48,23 @@ const QUESTION_CATEGORIES = [
 
 const NCSM_CHAPTERS = {
   "GK/CA": [
-    "National Parks",
-    "Country, Capital & Currency 361-365 | দেশ, রাজধানী ও মুদ্রা",
-    "Important Festivals & Fairs 366-371 | গুরুত্বপূর্ণ উৎসব ও মেলা",
-    "Famous Musicians & Their Instruments 372-377 | বিখ্যাত সংগীতশিল্পী ও তাঁদের বাদ্যযন্ত্র",
-    "Inventions & Their Inventors"
+    "Chapter 1 - National Park (জাতীয় উদ্যান)",
+    "Chapter 2 - Country, Capital & Currency (দেশ, রাজধানী ও মুদ্রা)",
+    "Chapter 3 - Important Festivals and Fairs (গুরুত্বপূর্ণ উৎসব ও মেলা)",
+    "Chapter 4 - Famous Musicians & Their Instruments (বিখ্যাত সংগীতশিল্পী ও তাঁদের বাদ্যযন্ত্র)",
+    "Chapter 5 - Inventions & Their Inventors (আবিষ্কার ও আবিষ্কারক)"
   ],
   "Mathematics": [
-    "Chapter 1 - Basic Concepts",
-    "Chapter 2 - Fundamentals",
-    "Chapter 3 - Intermediate Practice",
-    "Chapter 4 - Advanced Practice",
+    "Chapter 1 - Time & Work (সময় ও কার্য)",
+    "Chapter 2 - Pipe & Cistern (নল এবং চৌবাচ্চা)",
+    "Chapter 3 - Time & Distance (সময় এবং দূরত্ব)",
+    "Chapter 4 - Time & Distance Related to Trains (ট্রেন সংক্রান্ত সময় ও দূরত্ব)",
     "Chapter 5 - Revision Test"
   ],
   "Reasoning": [
-    "Chapter 1 - Basic Concepts",
-    "Chapter 2 - Fundamentals",
-    "Chapter 3 - Intermediate Practice",
+    "Chapter 1 - Classification",
+    "Chapter 2 - Calendar",
+    "Chapter 3 - Clock",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
@@ -76,21 +76,21 @@ const NCSM_CHAPTERS = {
     "Chapter 5 - Misc. Error Detection"
   ],
   "Polity": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Fundamental Rights, DPSP & Fundamental Duties (মৌলিক অধিকার, নির্দেশমূলক নীতি এবং মৌলিক কর্তব্য)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Economics": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - National Income (জাতীয় আয়)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Geography": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Drainage System of India (ভারতের নদ-নদী ও জলনির্গমন প্রণালী)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
@@ -98,27 +98,27 @@ const NCSM_CHAPTERS = {
   ],
   "History": [
     "Chapter 1 - Maurya Empire (মৌর্য সাম্রাজ্য)",
-    "Chapter 2 - Fundamentals",
-    "Chapter 3 - Intermediate Practice",
+    "Chapter 2 - Kushan Empire (কুশান সাম্রাজ্য)",
+    "Chapter 3 - Gupta Dynasty (গুপ্ত বংশ)",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Biology": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Tissues (Plant & Animal), Transpiration & Nitrogen Cycle (কলা (উদ্ভিদ ও প্রাণী), প্রস্বেদন এবং নাইট্রোজেন চক্র)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Chemistry": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Periodic Table (পর্যায় সারণী)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
     "Chapter 5 - Revision Test"
   ],
   "Physics": [
-    "Chapter 1 - Basic Concepts",
+    "Chapter 1 - Gravitation (মহাকর্ষ)",
     "Chapter 2 - Fundamentals",
     "Chapter 3 - Intermediate Practice",
     "Chapter 4 - Advanced Practice",
@@ -1211,6 +1211,20 @@ function updateQuestionSelectionUI(visibleQuestions) {
   const count = document.getElementById("questionSelectionCount");
   const clearButton = document.getElementById("clearQuestionSelectionBtn");
   const deleteButton = document.getElementById("deleteSelectedQuestionsBtn");
+  const chapterSelect = document.getElementById("bulkQuestionChapter");
+  const updateChapterButton = document.getElementById("bulkUpdateQuestionChapterBtn");
+  const selectedQuestions = allQuestions.filter(question =>
+    selectedQuestionIds.has(question.id)
+  );
+  const selectedSubject = selectedQuestions[0]?.subject;
+  const canUpdateChapter =
+    selectedQuestions.length > 0 &&
+    selectedQuestions.length === selectedCount &&
+    selectedQuestions.every(question =>
+      question.category === "NCSM" &&
+      question.subject === selectedSubject
+    ) &&
+    Array.isArray(NCSM_CHAPTERS[selectedSubject]);
   const visibleSelectedCount = visibleQuestions.filter(question =>
     selectedQuestionIds.has(question.id)
   ).length;
@@ -1225,6 +1239,37 @@ function updateQuestionSelectionUI(visibleQuestions) {
 
   if (deleteButton) {
     deleteButton.disabled = selectedCount === 0;
+  }
+
+  if (chapterSelect) {
+    if (canUpdateChapter) {
+      const currentChapter = chapterSelect.value;
+
+      if (chapterSelect.dataset.subject !== selectedSubject) {
+        chapterSelect.innerHTML = `
+          <option value="">Choose chapter...</option>
+          ${NCSM_CHAPTERS[selectedSubject]
+            .map(chapter => `<option value="${escapeHTML(chapter)}">${escapeHTML(chapter)}</option>`)
+            .join("")}
+        `;
+        chapterSelect.dataset.subject = selectedSubject;
+        chapterSelect.value = NCSM_CHAPTERS[selectedSubject].includes(currentChapter)
+          ? currentChapter
+          : "";
+      }
+
+      chapterSelect.disabled = false;
+    } else {
+      chapterSelect.innerHTML =
+        "<option value=''>Select NCSM questions from one subject</option>";
+      chapterSelect.dataset.subject = "";
+      chapterSelect.disabled = true;
+    }
+  }
+
+  if (updateChapterButton) {
+    updateChapterButton.disabled =
+      !canUpdateChapter || !chapterSelect?.value;
   }
 
   if (selectAll) {
@@ -1907,6 +1952,68 @@ function clearQuestionSelection() {
 
   selectedQuestionIds.clear();
   renderQuestionsTable();
+
+}
+
+
+function requestBulkQuestionChapterUpdate() {
+
+  const questionIds = [...selectedQuestionIds];
+  const chapter = document.getElementById("bulkQuestionChapter")?.value;
+  const questions = allQuestions.filter(question =>
+    questionIds.includes(question.id)
+  );
+  const subject = questions[0]?.subject;
+  const isValidSelection =
+    questions.length > 0 &&
+    questions.length === questionIds.length &&
+    questions.every(question =>
+      question.category === "NCSM" &&
+      question.subject === subject
+    ) &&
+    NCSM_CHAPTERS[subject]?.includes(chapter);
+
+  if (!isValidSelection) return;
+
+  pendingConfirmAction = async () => {
+    try {
+      for (let offset = 0; offset < questionIds.length; offset += 450) {
+        const batch = db.batch();
+        const batchQuestionIds = questionIds.slice(offset, offset + 450);
+
+        batchQuestionIds.forEach(questionId => {
+          batch.update(db.collection("questions").doc(questionId), {
+            chapter,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: currentAdmin.uid
+          });
+        });
+
+        await batch.commit();
+      }
+
+      showToast(
+        "Chapter Updated",
+        `Chapter changed for ${questionIds.length} selected question${questionIds.length === 1 ? "" : "s"}.`,
+        "success"
+      );
+
+      await loadQuestions();
+    } catch (error) {
+      console.error("Bulk chapter update error:", error);
+      showToast(
+        "Chapter Update Failed",
+        getFirebaseErrorMessage(error),
+        "error"
+      );
+      await loadQuestions();
+    }
+  };
+
+  showConfirmModal(
+    `Change chapter for ${questionIds.length} selected question${questionIds.length === 1 ? "" : "s"}?`,
+    `All selected ${subject} questions will be assigned to ${chapter}.`
+  );
 
 }
 
@@ -2811,8 +2918,7 @@ async function importQuestions() {
 
 
       const category =
-        question.category ||
-        "General Knowledge";
+        String(question.category || "General Knowledge").trim();
 
 
       const data = {
@@ -2835,12 +2941,12 @@ async function importQuestions() {
 
         subject:
           category === "NCSM"
-            ? String(question.subject || "")
+            ? String(question.subject || "").trim()
             : "",
 
         chapter:
           category === "NCSM"
-            ? String(question.chapter || "")
+            ? String(question.chapter || "").trim()
             : "",
 
         explanation:
@@ -3647,6 +3753,48 @@ function initializeEventListeners() {
     clearQuestionSelectionButton.addEventListener(
       "click",
       clearQuestionSelection
+    );
+  }
+
+
+  const bulkQuestionChapter =
+    document.getElementById("bulkQuestionChapter");
+
+  if (bulkQuestionChapter) {
+    bulkQuestionChapter.addEventListener(
+      "change",
+      () => {
+        const updateButton = document.getElementById(
+          "bulkUpdateQuestionChapterBtn"
+        );
+        const selectedQuestions = allQuestions.filter(question =>
+          selectedQuestionIds.has(question.id)
+        );
+        const subject = selectedQuestions[0]?.subject;
+        const validSelection =
+          selectedQuestions.length === selectedQuestionIds.size &&
+          selectedQuestions.length > 0 &&
+          selectedQuestions.every(question =>
+            question.category === "NCSM" &&
+            question.subject === subject
+          ) &&
+          NCSM_CHAPTERS[subject]?.includes(bulkQuestionChapter.value);
+
+        if (updateButton) {
+          updateButton.disabled = !validSelection;
+        }
+      }
+    );
+  }
+
+
+  const bulkUpdateQuestionChapterButton =
+    document.getElementById("bulkUpdateQuestionChapterBtn");
+
+  if (bulkUpdateQuestionChapterButton) {
+    bulkUpdateQuestionChapterButton.addEventListener(
+      "click",
+      requestBulkQuestionChapterUpdate
     );
   }
 
